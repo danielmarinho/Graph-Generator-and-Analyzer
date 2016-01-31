@@ -144,6 +144,29 @@ public class AnalisadorDeGrafo {
         }
     }
 
+    private boolean isEulerianoCircuito() {
+        for (int i = 0; i < matrizDeAdjacencia.length; i++) {
+            if (!(vizinhanca(i).length % 2 == 0)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean isEuleriano() {
+        int numDeVerticesDeGrauImpar = 0;
+        for (int i = 0; i < matrizDeAdjacencia.length; i++) {
+            if (!(vizinhanca(i).length % 2 == 0)) {
+                numDeVerticesDeGrauImpar++;
+                if (numDeVerticesDeGrauImpar > 2) {
+                    return false;
+                }
+
+            }
+        }
+        return true;
+    }
+
     private boolean isConexo() {
         return componentesConexas.size() == 1;
     }
@@ -186,6 +209,7 @@ public class AnalisadorDeGrafo {
         System.out.println("Pontes: " + pontes.toString());
         System.out.println("Componentes Conexas: " + componentesConexas.toString());
         System.out.println("Blocos: " + blocos.toString());
+        System.out.println("É Euleriano? R: " + isEuleriano());
     }
 
     public static void main(String[] args) {
