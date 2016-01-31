@@ -12,9 +12,9 @@ package graphgeneratorandanalyzer;
 import java.util.Scanner;
 
 public class GeradorDeGrafo {
-
     
-    public static void executar() {
+    
+    public static int[][] executar() {
         Scanner entrada = new Scanner(System.in);
         System.out.println("Gerador de Grafos\n\n");
         System.out.println("Digite o número de vértices do Grafo:");
@@ -25,10 +25,10 @@ public class GeradorDeGrafo {
         float p = entrada.nextFloat();
         if (m == 0) {
             m = (int) (((n * (n - 1)) / 2) * Math.random());
-            System.out.println(m);
+            System.out.println("Quantidade de arestas não especificada. Total de arestas que podem entrar no grafo: " + m);
         } else if (m > ((n * (n - 1)) / 2)) {
             System.out.println("Erro: Quantidade máxima de arestas para esses vértices é " + ((n * (n - 1)) / 2));
-            return;
+            System.exit(0);
         }
 
         int[][] matrizDeAdjacencia = new int[n][n];
@@ -56,11 +56,13 @@ public class GeradorDeGrafo {
 //        Impressao da matriz de adjacencia
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
-                System.out.print(matrizDeAdjacencia[i][j]);                               
+                System.out.print(matrizDeAdjacencia[i][j]);
+                System.out.print(" ");
             }
             System.out.println("");
         }
         
+        return matrizDeAdjacencia;
     }
 
 }

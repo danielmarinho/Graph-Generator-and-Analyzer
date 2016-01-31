@@ -28,6 +28,11 @@ public class Aresta {
         this.destino = destino;
         this.tipo = tipo;
     }
+
+    @Override
+    public String toString() {
+        return "Aresta{" + tipo +" "+ origem +"-"+ destino + '}';
+    }
    
     public TIPO getTipo() {
         return tipo;
