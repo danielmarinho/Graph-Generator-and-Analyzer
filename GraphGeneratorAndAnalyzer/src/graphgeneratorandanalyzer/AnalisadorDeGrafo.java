@@ -133,6 +133,14 @@ public class AnalisadorDeGrafo {
         return !arestasRetorno.isEmpty();
     }
     
+    private boolean isArvore(){
+        if(arestasRetorno.isEmpty() && isConexo()){
+            return true;
+        }else{
+            return false;
+        }
+    }
+    
     public void analisar(){
         conjuntoConexo.add(0);
         buscaEmProfundidade(0);
@@ -150,6 +158,7 @@ public class AnalisadorDeGrafo {
             }
         }
         System.out.println("É conexo? R:" + isConexo());
+        System.out.println("É árvore? R:" + isArvore());
         System.out.println("Possui ciclos? R:" + possuiCiclos());
         System.out.println("É bipartido? R:" + isBipartido);
         System.out.println("Articulações: " + articulacoes.toString());
