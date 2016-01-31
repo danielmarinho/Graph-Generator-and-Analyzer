@@ -142,11 +142,6 @@ public class AnalisadorDeGrafo {
                 pontes.add(aresta);
             }
         }
-        for (Aresta aresta : arestasRetorno) {
-            if (articulacoes.contains(aresta.getOrigem()) && articulacoes.contains(aresta.getDestino())) {
-                pontes.add(aresta);
-            }
-        }
     }
 
     private boolean isConexo() {
