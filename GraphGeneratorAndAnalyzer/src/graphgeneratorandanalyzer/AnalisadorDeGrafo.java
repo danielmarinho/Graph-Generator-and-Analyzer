@@ -137,7 +137,6 @@ public class AnalisadorDeGrafo {
     }
 
     private void localizaPontes() {
-        System.out.println("debugger1");
         for (Aresta aresta : arestasProfundidade) {
             if (articulacoes.contains(aresta.getOrigem()) && articulacoes.contains(aresta.getDestino())) {
                 pontes.add(aresta);
