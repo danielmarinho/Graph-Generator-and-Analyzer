@@ -35,6 +35,8 @@ public class AnalisadorDeGrafo {
     ArrayList<Aresta> arestasProfundidade;
     ArrayList<Aresta> arestasRetorno;
 
+    //Construtor
+    //Inicialização das variáveis   
     public AnalisadorDeGrafo(int[][] matrizDeAdjacencia) {
         this.matrizDeAdjacencia = matrizDeAdjacencia;
         this.pe = new int[matrizDeAdjacencia.length];
@@ -50,6 +52,9 @@ public class AnalisadorDeGrafo {
         t = 0;
     }
 
+    
+    //Método que encontra a vizinhança de um determinado vértice
+    //A matriz de adjacência é a variável da instância
     private Integer[] vizinhanca(int v) {
         ArrayList<Integer> vizinhos_aux = new ArrayList<>();
         Integer[] vizinhos;
@@ -70,6 +75,9 @@ public class AnalisadorDeGrafo {
         return vizinhos_aux.toArray(vizinhos);
     }
     
+    
+    //Método que encontra a vizinhança de um determinado vértice 
+    //A matriz de adjacência é passada como parâmetro
     private Integer[] vizinhanca(int [][] matrizDeAdjacencia, int v) {
         ArrayList<Integer> vizinhos_aux = new ArrayList<>();
         Integer[] vizinhos;
@@ -90,15 +98,19 @@ public class AnalisadorDeGrafo {
         return vizinhos_aux.toArray(vizinhos);
     }
 
+    
+    //Método que executa a busca em profundidade
+    //A busca foi modificada do algoritmo básico com adições para encontrar tudo o que foi pedido
     public void buscaEmProfundidade(int v) {
         t++;
         pe[v] = t;
         back[v] = t;
+        
+        //a variável filhos é usada para facilitar 
         int filhos = 0;
         for (int w : vizinhanca(v)) {
             if (pe[w] == 0) {
                 filhos++;
-//                marcar vw como aresta "azul" de profundidade
                 Aresta aresta = new Aresta(v, w, Aresta.TIPO.PROFUNDIDADE);
                 arestasProfundidade.add(aresta);
 
@@ -191,6 +203,10 @@ public class AnalisadorDeGrafo {
         return true;
     }
 
+    private boolean isBipartido(){
+        return isBipartido && isConexo();
+    }
+    
     private boolean isConexo() {
         return componentesConexas.size() == 1;
     }
@@ -200,11 +216,7 @@ public class AnalisadorDeGrafo {
     }
 
     private boolean isArvore() {
-        if (arestasRetorno.isEmpty() && isConexo()) {
-            return true;
-        } else {
-            return false;
-        }
+        return arestasRetorno.isEmpty() && isConexo();
     }
     
     private ArrayList<Integer> hierholzer(){
@@ -218,7 +230,7 @@ public class AnalisadorDeGrafo {
         Aresta arestaAux = arestasTotais.remove(0);
         int v0 = arestaAux.getOrigem();
         int origem = v0;
-        int destino = 0;
+        int destino;
         int vIndex = 0;
 
         circuito.add(origem);
@@ -237,7 +249,7 @@ public class AnalisadorDeGrafo {
                     circuitoLinha = new ArrayList<>();
                     for (Integer v : circuito) {
                         if (vizinhanca(matrizAdjacenciaLocal, v).length > 0) {
-                            v0 = (int) v;
+                            v0 = v;
                             origem = v0;
                             vIndex = circuito.indexOf(v);
                             circuitoLinha.add(v0);
@@ -250,56 +262,6 @@ public class AnalisadorDeGrafo {
         return circuito;
     }
     
-    private ArrayList<Aresta> fleury() {
-        if (isEulerianoCircuito()) {
-            int counter = 0;
-            ArrayList<Aresta> arestas = new ArrayList<>();
-            arestas.addAll(arestasProfundidade);
-            arestas.addAll(arestasRetorno);
-            int v0 = arestas.get(0).getOrigem();
-            ArrayList<Aresta> circuito = new ArrayList<>();
-            circuito.add(arestas.get(0));
-            Aresta a1 = null;
-            while (!arestas.isEmpty()) {
-                int v1;
-                if (counter == 0) {
-                    v1 = circuito.get(circuito.size() - 1).getOrigem();
-                } else {
-                    v1 = circuito.get(circuito.size() - 1).getDestino();
-                }
-                if (vizinhanca(v1).length == 1) {
-                    a1 = circuito.get(circuito.size() - 1);
-                } else {
-                    ArrayList<Aresta> vizinhos = new ArrayList<>();
-                    for (Aresta aresta : arestas) {
-                        if (aresta.getOrigem() == v1 || aresta.getDestino() == v1) {
-                            vizinhos.add(aresta);
-                        }
-                    }
-                    for (Aresta vizinho : vizinhos) {
-                        if (!pontes.contains(vizinho)) {
-
-                            a1 = vizinho;
-                            break;
-                        }
-
-                    }
-                }
-                arestas.remove(a1);
-                if (a1.getDestino() == v1) {
-                    a1.setDestino(a1.getOrigem());
-                    a1.setOrigem(v1);
-                }
-                circuito.add(a1);
-                counter++;
-            }
-            return circuito;
-        } else {
-            return new ArrayList<>();
-        }
-
-    }
-
     private static Aresta removeAresta(ArrayList<Aresta> conjunto,int origem,int destino){
         for (Aresta aresta : conjunto) {
             //testa ambas as possibilidades pois não é um digrafo!!!
@@ -338,13 +300,11 @@ public class AnalisadorDeGrafo {
         System.out.println("É conexo? R:" + isConexo());
         System.out.println("É árvore? R:" + isArvore());
         System.out.println("Possui ciclos? R:" + possuiCiclos());
-        System.out.println("É bipartido? R:" + isBipartido);
+        System.out.println("É bipartido? R:" + isBipartido());
         System.out.println("Articulações: " + articulacoes.toString());
         System.out.println("Pontes: " + pontes.toString());
         System.out.println("Componentes Conexas: " + componentesConexas.toString());
-        System.out.println("Blocos: " + blocos.toString());
-//        System.out.println("É Euleriano? R: " + isEuleriano());
-//        System.out.println("Circuito Euleriano: " + fleury().toString());
+        System.out.println("Quantidade de blocos -> #" + blocos.size() + ": " + blocos.toString());
         System.out.println("É Euleriano? R: " + isEulerianoCircuito());
         if(isEulerianoCircuito())
             System.out.println("Circuito Euleriano: " + hierholzer().toString());
@@ -356,6 +316,7 @@ public class AnalisadorDeGrafo {
 //        int matriz[][] = {{0,1,1,1,1},{0,0,1,1,1},{0,0,0,0,0},{0,0,0,0,0},{0,0,0,0,0}};
 //        int matriz[][] = {{0,1,1,1,1},{0,0,1,1,1},{0,0,0,0,0},{0,0,0,0,0},{0,0,0,0,0}};
 //        int matriz[][] = {{0,1,1,0,0,0},{0,0,1,1,1,0},{0,0,0,1,1,0},{0,0,0,0,1,1},{0,0,0,0,0,1},{0,0,0,0,0,0}};
+//        int matriz[][] = {{0,1,1,1,1,0},{0,0,1,1,1,0},{0,0,0,1,0,1},{0,0,0,0,1,0},{0,0,0,0,0,1},{0,0,0,0,0,0}};
         AnalisadorDeGrafo analisador = new AnalisadorDeGrafo(matriz);
         analisador.analisar();
     }
