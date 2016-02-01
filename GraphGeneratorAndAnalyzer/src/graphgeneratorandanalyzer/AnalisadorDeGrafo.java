@@ -207,7 +207,7 @@ public class AnalisadorDeGrafo {
         }
     }
     
-    public ArrayList<Integer> hierholzer(){
+    private ArrayList<Integer> hierholzer(){
         int [][] matrizAdjacenciaLocal = matrizDeAdjacencia.clone();
         ArrayList<Aresta> arestasTotais = new ArrayList<>(arestasProfundidade);
         ArrayList<Aresta> aux = new ArrayList<>(arestasRetorno);
@@ -300,7 +300,7 @@ public class AnalisadorDeGrafo {
 
     }
 
-    public static Aresta removeAresta(ArrayList<Aresta> conjunto,int origem,int destino){
+    private static Aresta removeAresta(ArrayList<Aresta> conjunto,int origem,int destino){
         for (Aresta aresta : conjunto) {
             //testa ambas as possibilidades pois não é um digrafo!!!
             if ( (aresta.getOrigem() == origem && aresta.getDestino() == destino) || (aresta.getOrigem() == destino && aresta.getDestino() == origem) )
@@ -309,7 +309,7 @@ public class AnalisadorDeGrafo {
         return null;
     }
     
-    public static void atualizaMatrizAdjacencia(int [][] matrizAdjacencia, int lin, int col){
+    private static void atualizaMatrizAdjacencia(int [][] matrizAdjacencia, int lin, int col){
         if (lin > col) {
             matrizAdjacencia[col][lin] = 0;
         } else {
@@ -351,10 +351,11 @@ public class AnalisadorDeGrafo {
     }
 
     public static void main(String[] args) {
-//        int[][] matriz = GeradorDeGrafo.executar();
+        int[][] matriz = GeradorDeGrafo.executar();
 //        int matriz[][] = {{0,0,1,1,0},{0,0,1,1,0},{0,0,0,0,0},{0,0,0,0,0},{0,0,0,0,0}};
 //        int matriz[][] = {{0,1,1,1,1},{0,0,1,1,1},{0,0,0,0,0},{0,0,0,0,0},{0,0,0,0,0}};
-        int matriz[][] = {{0,1,1,1,1},{0,0,1,1,1},{0,0,0,1,1},{0,0,0,0,1},{0,0,0,0,0}};
+//        int matriz[][] = {{0,1,1,1,1},{0,0,1,1,1},{0,0,0,0,0},{0,0,0,0,0},{0,0,0,0,0}};
+//        int matriz[][] = {{0,1,1,0,0,0},{0,0,1,1,1,0},{0,0,0,1,1,0},{0,0,0,0,1,1},{0,0,0,0,0,1},{0,0,0,0,0,0}};
         AnalisadorDeGrafo analisador = new AnalisadorDeGrafo(matriz);
         analisador.analisar();
     }
