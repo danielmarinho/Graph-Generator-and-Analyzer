@@ -183,6 +183,56 @@ public class AnalisadorDeGrafo {
         }
     }
 
+    private ArrayList<Aresta> fleury() {
+        if (isEulerianoCircuito()) {
+            int counter = 0;
+            ArrayList<Aresta> arestas = new ArrayList<>();
+            arestas.addAll(arestasProfundidade);
+            arestas.addAll(arestasRetorno);
+            int v0 = arestas.get(0).getOrigem();
+            ArrayList<Aresta> circuito = new ArrayList<>();
+            circuito.add(arestas.get(0));
+            Aresta a1 = null;
+            while (!arestas.isEmpty()) {
+                int v1;
+                if (counter == 0) {
+                    v1 = circuito.get(circuito.size() - 1).getOrigem();
+                } else {
+                    v1 = circuito.get(circuito.size() - 1).getDestino();
+                }
+                if (vizinhanca(v1).length == 1) {
+                    a1 = circuito.get(circuito.size() - 1);
+                } else {
+                    ArrayList<Aresta> vizinhos = new ArrayList<>();
+                    for (Aresta aresta : arestas) {
+                        if (aresta.getOrigem() == v1 || aresta.getDestino() == v1) {
+                            vizinhos.add(aresta);
+                        }
+                    }
+                    for (Aresta vizinho : vizinhos) {
+                        if (!pontes.contains(vizinho)) {
+
+                            a1 = vizinho;
+                            break;
+                        }
+
+                    }
+                }
+                arestas.remove(a1);
+                if (a1.getDestino() == v1) {
+                    a1.setDestino(a1.getOrigem());
+                    a1.setOrigem(v1);
+                }
+                circuito.add(a1);
+                counter++;
+            }
+            return circuito;
+        } else {
+            return new ArrayList<>();
+        }
+
+    }
+
     public void analisar() {
         conjuntoConexo.add(0);
         buscaEmProfundidade(0);
@@ -210,6 +260,7 @@ public class AnalisadorDeGrafo {
         System.out.println("Componentes Conexas: " + componentesConexas.toString());
         System.out.println("Blocos: " + blocos.toString());
         System.out.println("É Euleriano? R: " + isEuleriano());
+        System.out.println("Circuito Euleriano: " + fleury().toString());
     }
 
     public static void main(String[] args) {
