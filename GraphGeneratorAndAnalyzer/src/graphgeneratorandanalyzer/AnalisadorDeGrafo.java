@@ -69,6 +69,26 @@ public class AnalisadorDeGrafo {
         vizinhos = new Integer[vizinhos_aux.size()];
         return vizinhos_aux.toArray(vizinhos);
     }
+    
+    private Integer[] vizinhanca(int [][] matrizDeAdjacencia, int v) {
+        ArrayList<Integer> vizinhos_aux = new ArrayList<>();
+        Integer[] vizinhos;
+
+        for (int lin = 0; lin < matrizDeAdjacencia.length; lin++) {
+            if (matrizDeAdjacencia[lin][v] == 1) {
+                vizinhos_aux.add(lin);
+            }
+            if (lin == v) {
+                for (int col = v + 1; col < matrizDeAdjacencia.length; col++) {
+                    if (matrizDeAdjacencia[v][col] == 1) {
+                        vizinhos_aux.add(col);
+                    }
+                }
+            }
+        }
+        vizinhos = new Integer[vizinhos_aux.size()];
+        return vizinhos_aux.toArray(vizinhos);
+    }
 
     public void buscaEmProfundidade(int v) {
         t++;
@@ -145,12 +165,16 @@ public class AnalisadorDeGrafo {
     }
 
     private boolean isEulerianoCircuito() {
-        for (int i = 0; i < matrizDeAdjacencia.length; i++) {
-            if (!(vizinhanca(i).length % 2 == 0)) {
-                return false;
+        if (isConexo()) {               //deve ser conexo
+            for (int i = 0; i < matrizDeAdjacencia.length; i++) {
+                if (!(vizinhanca(i).length % 2 == 0)) {
+                    return false;
+                }
             }
+            return true;
+        } else {
+            return false;
         }
-        return true;
     }
 
     private boolean isEuleriano() {
@@ -182,7 +206,50 @@ public class AnalisadorDeGrafo {
             return false;
         }
     }
+    
+    public ArrayList<Integer> hierholzer(){
+        int [][] matrizAdjacenciaLocal = matrizDeAdjacencia.clone();
+        ArrayList<Aresta> arestasTotais = new ArrayList<>(arestasProfundidade);
+        ArrayList<Aresta> aux = new ArrayList<>(arestasRetorno);
+        arestasTotais.addAll(aux);
+        ArrayList<Integer> circuito = new ArrayList<>();
+        ArrayList<Integer> circuitoLinha = new ArrayList<>();
 
+        Aresta arestaAux = arestasTotais.remove(0);
+        int v0 = arestaAux.getOrigem();
+        int origem = v0;
+        int destino = 0;
+        int vIndex = 0;
+
+        circuito.add(origem);
+        circuitoLinha.add(origem);
+        
+        while (!arestasTotais.isEmpty()) {
+            destino = vizinhanca(matrizAdjacenciaLocal, origem)[0];
+            removeAresta(arestasTotais, origem, destino);
+            atualizaMatrizAdjacencia(matrizAdjacenciaLocal, origem, destino);
+            origem = destino;
+            circuitoLinha.add(destino);
+            if (destino == v0) {
+                if (vizinhanca(matrizAdjacenciaLocal, destino).length == 0) {
+                    circuito.remove(vIndex);
+                    circuito.addAll(vIndex, circuitoLinha);
+                    circuitoLinha = new ArrayList<>();
+                    for (Integer v : circuito) {
+                        if (vizinhanca(matrizAdjacenciaLocal, v).length > 0) {
+                            v0 = (int) v;
+                            origem = v0;
+                            vIndex = circuito.indexOf(v);
+                            circuitoLinha.add(v0);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        return circuito;
+    }
+    
     private ArrayList<Aresta> fleury() {
         if (isEulerianoCircuito()) {
             int counter = 0;
@@ -233,6 +300,23 @@ public class AnalisadorDeGrafo {
 
     }
 
+    public static Aresta removeAresta(ArrayList<Aresta> conjunto,int origem,int destino){
+        for (Aresta aresta : conjunto) {
+            //testa ambas as possibilidades pois não é um digrafo!!!
+            if ( (aresta.getOrigem() == origem && aresta.getDestino() == destino) || (aresta.getOrigem() == destino && aresta.getDestino() == origem) )
+                return conjunto.remove(conjunto.indexOf(aresta));
+        }
+        return null;
+    }
+    
+    public static void atualizaMatrizAdjacencia(int [][] matrizAdjacencia, int lin, int col){
+        if (lin > col) {
+            matrizAdjacencia[col][lin] = 0;
+        } else {
+            matrizAdjacencia[lin][col] = 0;
+        }
+    }
+    
     public void analisar() {
         conjuntoConexo.add(0);
         buscaEmProfundidade(0);
@@ -259,13 +343,18 @@ public class AnalisadorDeGrafo {
         System.out.println("Pontes: " + pontes.toString());
         System.out.println("Componentes Conexas: " + componentesConexas.toString());
         System.out.println("Blocos: " + blocos.toString());
-        System.out.println("É Euleriano? R: " + isEuleriano());
-        System.out.println("Circuito Euleriano: " + fleury().toString());
+//        System.out.println("É Euleriano? R: " + isEuleriano());
+//        System.out.println("Circuito Euleriano: " + fleury().toString());
+        System.out.println("É Euleriano? R: " + isEulerianoCircuito());
+        if(isEulerianoCircuito())
+            System.out.println("Circuito Euleriano: " + hierholzer().toString());
     }
 
     public static void main(String[] args) {
-        int[][] matriz = GeradorDeGrafo.executar();
+//        int[][] matriz = GeradorDeGrafo.executar();
 //        int matriz[][] = {{0,0,1,1,0},{0,0,1,1,0},{0,0,0,0,0},{0,0,0,0,0},{0,0,0,0,0}};
+//        int matriz[][] = {{0,1,1,1,1},{0,0,1,1,1},{0,0,0,0,0},{0,0,0,0,0},{0,0,0,0,0}};
+        int matriz[][] = {{0,1,1,1,1},{0,0,1,1,1},{0,0,0,1,1},{0,0,0,0,1},{0,0,0,0,0}};
         AnalisadorDeGrafo analisador = new AnalisadorDeGrafo(matriz);
         analisador.analisar();
     }
