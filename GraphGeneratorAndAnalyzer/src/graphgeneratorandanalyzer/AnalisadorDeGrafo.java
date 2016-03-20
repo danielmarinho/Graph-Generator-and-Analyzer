@@ -7,6 +7,8 @@ package graphgeneratorandanalyzer;
 
 import estruturadedados.Aresta;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 
 /**
  *
@@ -303,17 +305,49 @@ public class AnalisadorDeGrafo {
             // Se no grafo só existirem dois vértices de grau ímpar, devemos encontrar 
             // o menor caminho entre eles e duplicar as arestas ao longo desse caminho
             if(verticesGrauImpar.size() == 2){
-                floydWarshall(verticesGrauImpar.get(0));
+                floydWarshall();
                 ArrayList<Integer> caminho = caminhoEntre(verticesGrauImpar.get(0),verticesGrauImpar.get(1));
                 duplicarArestasCaminho(caminho);
                 // após termos duplicado as arestas do caminho, devemos rodar
                 // novamente o algoritmo para encontrar um circuito euleriano visto
                 // que o grafo virou um grafo euleriano e assim podemos encontrar um caminho ótimo
                 circuito = hierholzer();
-            }else{
+            } else {
             // Se o número de vértices com grau ímpar for maior que 2, devemos fazer uma
-            // combinação 2 a 2 para cada par desses vértices e encontrar aqueles que dão o menor caminho
-                
+                // combinação 2 a 2 para cada par desses vértices e encontrar aqueles que dão o menor caminho
+                HashMap<Integer[], Integer> menorCaminhoEntreVerticesImpar = new HashMap<Integer[], Integer>();
+                int menorCaminho = Integer.MAX_VALUE;
+                Integer[] key = new Integer[2];
+                Integer value = 0;
+                floydWarshall();
+                int[][] matrizTamCaminhosMinimos = D.clone();
+                for (int i = 0; i < verticesGrauImpar.size()-1; i++) {
+                    for (int j = i + 1; j < verticesGrauImpar.size(); j++) {
+                        if (matrizTamCaminhosMinimos[verticesGrauImpar.get(i)][verticesGrauImpar.get(j)] < menorCaminho) {
+                            menorCaminho = matrizTamCaminhosMinimos[verticesGrauImpar.get(i)][verticesGrauImpar.get(j)];
+                            key[0] = verticesGrauImpar.get(i);
+                            key[1] = verticesGrauImpar.get(j);
+                            value = menorCaminho;
+                        }
+                    }
+                    matrizTamCaminhosMinimos[key[0]][key[1]] = Integer.MAX_VALUE;
+                    menorCaminhoEntreVerticesImpar.put(key.clone(), value);
+                    menorCaminho = Integer.MAX_VALUE;
+                }
+                Iterator it = menorCaminhoEntreVerticesImpar.keySet().iterator();
+                ArrayList<Integer> verticesUtilizados = new ArrayList<>();
+                while (it.hasNext()) {
+                    Integer[] ligacaoVerticesImpares = (Integer[]) it.next();
+                    // Caso um par de caminhos mínimos seja escolhido, o próximo par a ser escolhido não
+                    // pode conter nenhum de seus vértices já pertencentes a algum par já escolhido.
+                    if(!verticesUtilizados.contains(ligacaoVerticesImpares[0]) && !verticesUtilizados.contains(ligacaoVerticesImpares[1]) ){
+                        ArrayList<Integer> caminho = caminhoEntre(ligacaoVerticesImpares[0], ligacaoVerticesImpares[1]);
+                        verticesUtilizados.add(ligacaoVerticesImpares[0]);
+                        verticesUtilizados.add(ligacaoVerticesImpares[1]);
+                        duplicarArestasCaminho(caminho);
+                    }
+                }
+                circuito = hierholzer();
             }
         }
         return circuito;
@@ -361,7 +395,7 @@ public class AnalisadorDeGrafo {
     //----------------------------------------------------------------------------------
     
     //---------------------------------FLOYD WARSHALL-------------------------------
-    private void floydWarshall(int v){
+    private void floydWarshall(){
          D = inicializa_pesos_D0();
         int[][] D_anterior = D.clone();
          P = inicializa_predecessores();
@@ -478,7 +512,9 @@ public class AnalisadorDeGrafo {
 //        int matriz[][] = {{0,1,1,1,1},{0,0,1,1,1},{0,0,0,0,0},{0,0,0,0,0},{0,0,0,0,0}};
 //        int matriz[][] = {{0,1,1,0,0,0},{0,0,1,1,1,0},{0,0,0,1,1,0},{0,0,0,0,1,1},{0,0,0,0,0,1},{0,0,0,0,0,0}};
 //        int matriz[][] = {{0,1,1,1,1,0},{0,0,1,1,1,0},{0,0,0,1,0,1},{0,0,0,0,1,0},{0,0,0,0,0,1},{0,0,0,0,0,0}};
-        int matriz[][] = {{0,1,1,1,0},{0,0,0,1,0},{0,0,0,1,0},{0,0,0,0,1},{0,0,0,0,0}}; //grafo com dois vértices de grau ímpar
+//        int matriz[][] = {{0,1,1,1,0},{0,0,0,1,0},{0,0,0,1,0},{0,0,0,0,1},{0,0,0,0,0}}; //grafo com dois vértices de grau ímpar
+//        int matriz[][] = {{0,1,0,0,0,0},{0,0,1,0,0,1},{0,0,0,1,0,1},{0,0,0,0,1,0},{0,0,0,0,0,1},{0,0,0,0,0,0}};
+        int matriz[][] = {{0,1,1,0,0,0},{0,0,1,1,0,0},{0,0,0,0,1,0},{0,0,0,0,1,1},{0,0,0,0,0,1},{0,0,0,0,0,0}};
         AnalisadorDeGrafo analisador = new AnalisadorDeGrafo(matriz);
         analisador.analisar();
     }
