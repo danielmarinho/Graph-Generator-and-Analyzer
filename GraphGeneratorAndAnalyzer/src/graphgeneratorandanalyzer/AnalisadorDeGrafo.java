@@ -7,8 +7,11 @@ package graphgeneratorandanalyzer;
 
 import estruturadedados.Aresta;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  *
@@ -315,7 +318,7 @@ public class AnalisadorDeGrafo {
             } else {
             // Se o número de vértices com grau ímpar for maior que 2, devemos fazer uma
                 // combinação 2 a 2 para cada par desses vértices e encontrar aqueles que dão o menor caminho
-                HashMap<Integer[], Integer> menorCaminhoEntreVerticesImpar = new HashMap<Integer[], Integer>();
+                Map<Integer[], Integer> menorCaminhoEntreVerticesImpar = new LinkedHashMap<>();
                 int menorCaminho = Integer.MAX_VALUE;
                 Integer[] key = new Integer[2];
                 Integer value = 0;
@@ -344,9 +347,13 @@ public class AnalisadorDeGrafo {
                         ArrayList<Integer> caminho = caminhoEntre(ligacaoVerticesImpares[0], ligacaoVerticesImpares[1]);
                         verticesUtilizados.add(ligacaoVerticesImpares[0]);
                         verticesUtilizados.add(ligacaoVerticesImpares[1]);
+                        // Duplicam-se as arestas ao longo do caminho minimo entre o par de vértices escolhido
                         duplicarArestasCaminho(caminho);
                     }
                 }
+                // após termos duplicado as arestas do caminho, devemos rodar
+                // novamente o algoritmo para encontrar um circuito euleriano visto
+                // que o grafo virou um grafo euleriano e assim podemos encontrar um caminho ótimo
                 circuito = hierholzer();
             }
         }
@@ -502,11 +509,15 @@ public class AnalisadorDeGrafo {
 //        if(isEulerianoCircuito())
 //            System.out.println("Circuito Euleriano: " + hierholzer().toString());
         
-        System.out.println("Circuito carteiro chinês: " + carteiroChines().toString());
+        ArrayList<Integer> resultado = carteiroChines();
+        if(resultado.size() > 2)
+            System.out.println("Circuito carteiro chinês: " + resultado.toString());
+        else
+            System.out.println("Deu merda!!!");
     }
 
     public static void main(String[] args) {
-//        int[][] matriz = GeradorDeGrafo.executar();
+        int[][] matriz = GeradorDeGrafo.executar();
 //        int matriz[][] = {{0,0,1,1,0},{0,0,1,1,0},{0,0,0,0,0},{0,0,0,0,0},{0,0,0,0,0}};
 //        int matriz[][] = {{0,1,1,1,1},{0,0,1,1,1},{0,0,0,0,0},{0,0,0,0,0},{0,0,0,0,0}};
 //        int matriz[][] = {{0,1,1,1,1},{0,0,1,1,1},{0,0,0,0,0},{0,0,0,0,0},{0,0,0,0,0}};
@@ -514,7 +525,9 @@ public class AnalisadorDeGrafo {
 //        int matriz[][] = {{0,1,1,1,1,0},{0,0,1,1,1,0},{0,0,0,1,0,1},{0,0,0,0,1,0},{0,0,0,0,0,1},{0,0,0,0,0,0}};
 //        int matriz[][] = {{0,1,1,1,0},{0,0,0,1,0},{0,0,0,1,0},{0,0,0,0,1},{0,0,0,0,0}}; //grafo com dois vértices de grau ímpar
 //        int matriz[][] = {{0,1,0,0,0,0},{0,0,1,0,0,1},{0,0,0,1,0,1},{0,0,0,0,1,0},{0,0,0,0,0,1},{0,0,0,0,0,0}};
-        int matriz[][] = {{0,1,1,0,0,0},{0,0,1,1,0,0},{0,0,0,0,1,0},{0,0,0,0,1,1},{0,0,0,0,0,1},{0,0,0,0,0,0}};
+//        int matriz[][] = {{0,1,1,0,0,0},{0,0,1,1,0,0},{0,0,0,0,1,0},{0,0,0,0,1,1},{0,0,0,0,0,1},{0,0,0,0,0,0}};
+//                int[][] matriz = {{0,1,1,1},{0,0,1,1},{0,0,0,1},{0,0,0,0}};
+        
         AnalisadorDeGrafo analisador = new AnalisadorDeGrafo(matriz);
         analisador.analisar();
     }
